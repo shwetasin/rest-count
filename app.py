@@ -2,7 +2,6 @@ import os
 from flask import Flask, request, jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
-import jsonify
 import socket
 
 from sqlalchemy.sql import func
