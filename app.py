@@ -3,8 +3,27 @@ from flask import Flask, request, jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 import socket
+import requests
 
 from sqlalchemy.sql import func
+
+URL ="https://restcountries.com/v3.1/all"
+
+
+location = "Countries"
+
+PARAMS = {'address':location}
+
+r = requests.get(url = URL, params = PARAMS)
+
+data = r.json()
+
+latitude = data[0]['latlng'][0]
+longitude = data[0]['latlng'][1]
+# formatted_address = data['results'][0]['formatted_address']
+
+print("Latitude:%s\nLongitude:%s"
+      %(latitude, longitude))
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -45,8 +64,12 @@ def country (page_num):
 def get_all_countries():
     # country = Country.query.filter_by(country=request.data['country']).first()
 
-    countries =Country.query.all()
+    # countries =Country.query.all()
+    URL ="https://restcountries.com/v3.1/all"
 
+    r = requests.get(url = URL, params = PARAMS)
+
+    countries = r.json()
     obj=[]
 
 
@@ -54,15 +77,15 @@ def get_all_countries():
 
 
         country_data ={}
-        country_data ['country'] =country.country
-        country_data ['capital'] =country.capital
-        country_data ['currency'] =country.currency
-        country_data ['region'] =country.region
-        country_data['language '] = country.language
-        country_data['area '] = country.area
-        country_data['flag '] = country.flag
-        country_data['population'] = country.population
-        country_data['timezone'] = country.timezone
+        country_data ['country'] =country['name']['common']
+        country_data ['capital'] =country['capital'][0] if 'capital' in country else None
+        country_data ['currency'] =country['currencies'] if 'currencies' in country else None
+        country_data ['region'] =country['region'] if 'region' in country else None
+        country_data['language '] = country['languages'] if 'languages' in country else None
+        country_data['area '] = country['area'] if 'area' in country else None
+        country_data['flag '] = country['flags'] if 'flags' in country else None
+        country_data['population'] = country['population'] if 'population' in country else None
+        country_data['timezone'] = country['timezones'] if 'timezones' in country else None
 
 
         obj.append(country_data)
