@@ -1,9 +1,12 @@
+from locale import currency
 import os
+from sqlite3 import register_converter
 from flask import Flask, request, jsonify,make_response
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 import socket
 import requests
+import json
 
 from sqlalchemy.sql import func
 
@@ -29,18 +32,20 @@ print("Latitude:%s\nLongitude:%s"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost/Countries'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://:postgres@localhost/Countries'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app)
 
 
+
+
 class Country(db.Model):
     __tablename__ = 'Country'
     id = db.Column(db.Integer, primary_key=True)
-    country=db.Column(db.String(100))
+    country=db.Column (db.JSON)
     capital= db.Column(db.String(100))
-    currency=db.Column(db.String(100))
+    currency=db.Column(db.JSON)
     region = db.Column(db.String(100))
     language = db.Column(db.String(150))
     area = db.Column(db.Float(50))
@@ -72,8 +77,25 @@ def get_all_countries():
     countries = r.json()
     obj=[]
 
-
+    countries_list= []
     for country in countries:
+        print('---------------1---------->')
+        country_obj = Country (
+    
+            country=country['name'] ['common'],
+            capital=country['capital'][0] if 'capital' in country else None,
+            currency=country['currencies'] if 'currencies' in country else None,
+            region=country['region'] if 'region' in country else None,
+            language=country['languages'] if 'languages' in country else None,
+            area=country['area'] if 'area' in country else None,
+            flag=country['flags'] if 'flags' in country else None,
+            population=country['population'] if 'population' in country else None,
+            timezone=country['timezones'] if 'timezones' in country else None,
+        )
+        countries_list.append(country_obj)
+
+
+        print('---------------2---------->')
 
 
         country_data ={}
@@ -91,6 +113,8 @@ def get_all_countries():
         obj.append(country_data)
 
     print(obj)
+    db.session.add_all(countries_list)
+    db.session.commit()
     return {'countries':obj}
     
 if __name__ == '__main__':
