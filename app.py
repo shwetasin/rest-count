@@ -32,7 +32,7 @@ print("Latitude:%s\nLongitude:%s"
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://:postgres@localhost/Countries'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost/Countries'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app)
@@ -43,19 +43,80 @@ db = SQLAlchemy(app)
 class Country(db.Model):
     __tablename__ = 'Country'
     id = db.Column(db.Integer, primary_key=True)
-    country=db.Column (db.JSON)
-    capital= db.Column(db.String(100))
+    country=db.Column (db.String(150))
+    capital= db.Column(db.JSON)
     currency=db.Column(db.JSON)
     region = db.Column(db.String(100))
-    language = db.Column(db.String(150))
+    language = db.Column(db.JSON)
     area = db.Column(db.Float(50))
-    flag = db.Column(db.String(100))
+    flag = db.Column(db.JSON)
     population = db.Column(db.Integer())
-    timezone = db.Column(db.String(10))
+    timezone = db.Column(db.JSON)
 
 
     def __repr__(self):
         return f'<Country {self.capital}>'
+
+#     Country = { 
+#                 "name" :"Republic of North Macedonia",
+#                 "captial":"Skopje",
+#                 "currency":"denar",
+#                 "region"  : "Europe",
+#                 "language":"Macedonian",
+#                 "area" : 25713.0,
+#                 "flag" :"🇲🇰",
+#                 "population":2077132,
+#                 "timezone":"UTC+01:00"
+               
+#                "name": "Republic of Yemen",
+#                 "captial":"Sana'a",
+#                 "currency":"Yemeni rial",
+#                 "region"  : "Asia",
+#                 "language":"Arabic",
+#                 "area" : 527968.0,
+#                 "flag" :"🇾🇪",
+#                 "population":29825968,
+#                 "timezone":"UTC+03:00"
+           
+#                 "name" :"Sint Maarten",
+#                 "captial":"Philipsburg",
+#                 "currency":"Netherlands Antillean guilder",
+#                 "region"  : "Americas",
+#                 "language":[
+#                     {"eng": "English",}
+#                     {"fra": "French",}
+#                     {"nld": "Dutch"}
+#                 ],
+#                 "area" : 34.0,
+#                 "flag" :"sx",
+#                 "population":40812,
+#                 "timezone":"UTC-04:00"
+
+#                 "name": "Macau",
+#                 "captial":"Sana'a",
+#                 "currency":"Macanese pataca",
+#                 "region"  : "Asia",
+#                 "language":[
+#                     { "por": "Portuguese"},
+#                     {"zho": "Chinese"}
+#                 ],
+#                 "area" : 30.0,
+#                 "flag" :"MO",
+#                 "population":649342,
+#                 "timezone":"UTC+08:00"
+
+#                 "name": "Nigeria",
+#                 "captial":"Abuja",
+#                 "currency":"Nigerian naira",
+#                 "region"  : "Africa",
+#                 "language":"English",
+#                 "area" : 923768.0,
+#                 "flag" :"NG",
+#                 "population":206139587,
+#                 "timezone":"UTC+01:00"
+               
+# }
+ 
 
 @app.route('/country/<int:page_num>')
 def country (page_num):
